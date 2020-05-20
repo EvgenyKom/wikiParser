@@ -8,25 +8,22 @@ import java.io.IOException;
 
 public class WikiParser {
 
-    public boolean containArticle(String article, String url) {
-        int linkCount = 0;
-        Document document;
-        try {
-            document = Jsoup.connect(url).get();
+    public Document getCurrentDocument(String url) throws IOException {
+        return Jsoup.connect(url).get();
+    }
 
-            String headArticle = document.getElementById("firstHeading").text();
+    public boolean containArticle(String article, Document document) {
+        Elements links = document.select("a[href^=/wiki/]").select("[title=" + article + "]");
 
-            Elements links = document.select("a[href^=/wiki/]").select("[title=" + article + "]");
+        return links.size() > 0;
+    }
 
-            if (links.size() > 0) {
-                return true;
-            }
+    public Elements getLinks(String url) throws IOException {
+        Document document = Jsoup.connect(url).get();
+        return document.select("a[href^=/wiki/]");
+    }
 
-        } catch (
-                IOException e) {
-            e.printStackTrace();
-        }
-
-        return false;
+    public String getTitle(Document document) {
+        return document.getElementById("firstHeading").text();
     }
 }
