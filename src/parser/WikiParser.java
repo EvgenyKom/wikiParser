@@ -5,8 +5,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.Set;
 
 public class WikiParser {
+    public static int linkClickCount = 1;
 
     public Document getCurrentDocument(String url) throws IOException {
         return Jsoup.connect(url).get();
@@ -18,12 +20,25 @@ public class WikiParser {
         return links.size() > 0;
     }
 
-    public Elements getLinks(String url) throws IOException {
-        Document document = Jsoup.connect(url).get();
+    public Elements getLinks(Document document) {
         return document.select("a[href^=/wiki/]");
     }
 
     public String getTitle(Document document) {
         return document.getElementById("firstHeading").text();
+    }
+
+    public boolean isLinksContainArticle(Set<String> linksSet, String article) throws IOException {
+        boolean contain = false;
+
+        for (String link : linksSet) {
+            Document document = getCurrentDocument(link);
+
+            if (containArticle(article, document)) {
+                contain = true;
+            }
+        }
+
+        return contain;
     }
 }
